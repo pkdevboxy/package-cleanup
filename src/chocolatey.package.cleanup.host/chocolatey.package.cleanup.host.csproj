@@ -147,7 +147,7 @@
     <Content Include="shell\PrepareMachine.ps1">
       <CopyToOutputDirectory Condition="'$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="package.cleanup.exe.config.template">
+    <Content Include="package-cleanup.exe.config.template">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
