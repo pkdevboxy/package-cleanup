@@ -50,7 +50,7 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
             resultsMessage.AppendLine(" * Log in to the site and respond to the review comments.");
             resultsMessage.AppendLine(" * Resubmit fixes for this version.");
             resultsMessage.AppendLine(" * If the package version is failing automated checks, you can self-reject the package.");
-            resultsMessage.AppendLine("{0}If your package is failing automated testing, you can use the [chocolatey test environment](https://github.com/chocolatey/chocolatey-test-environment to manually run the verification) to determine what needs to be fixed.".format_with(Environment.NewLine));
+            resultsMessage.AppendLine("{0}If your package is failing automated testing, you can use the [chocolatey test environment](https://github.com/chocolatey/chocolatey-test-environment) to manually run the verification and determine what may need to be fixed.".format_with(Environment.NewLine));
             resultsMessage.AppendLine("{0}**Note**: We don't like to see packages automatically rejected. It doesn't mean that we don't value your contributions, just that we can not continue to hold packages versions in a waiting status that have possibly been abandoned. If you don't believe you will be able to fix up this version of the package within 15 days, we strongly urge you to log in to the site and respond to the review comments until you are able to.".format_with(Environment.NewLine));
 
             EventManager.publish(new FinalResultMessage(message.PackageId, message.PackageVersion, resultsMessage.to_string(), reject: false));
