@@ -18,7 +18,7 @@
   <system.net>
     <mailSettings>
       <!-- Local Debug directory -->
-      <smtp deliveryMethod="${server.smtp.deliveryMethod}" from="package-cleanup-service@noreply.org">
+      <smtp deliveryMethod="${server.smtp.deliveryMethod}" from="package-cleaner-service@noreply.org">
         <network host="${server.smtp}" defaultCredentials="${email.use.defaultCredentials}" enableSsl="${server.smtp.enablessl}" port="${server.smtp.port}" ${server.smtp.credentials} />
         <specifiedPickupDirectory pickupDirectoryLocation=".\App_Data\Email"/>
       </smtp>
@@ -84,7 +84,7 @@
       <port value="${server.smtp.port}" />
       <to value="${email.errors.to}" />
       <from value="package-cleanup-service@noreply.org" />
-      <subject value="Chocolatey Package Cleanup Errors - ${environment}" />
+      <subject value="Chocolatey Package Cleaner Errors - ${environment}" />
       <bufferSize value="1"/>
       <lossy value="true"/>
       <evaluator type="log4net.Core.LevelEvaluator">
@@ -106,7 +106,7 @@
 
 
   <startup>
-    <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.5.2"/>
+    <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.0"/>
   </startup>
   
   <runtime>
