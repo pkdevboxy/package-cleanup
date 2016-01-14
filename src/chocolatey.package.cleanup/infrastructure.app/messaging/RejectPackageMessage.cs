@@ -17,9 +17,9 @@ namespace chocolatey.package.cleanup.infrastructure.app.messaging
 {
     using infrastructure.messaging;
 
-    public class ValidatePackageMessage : IMessage
+    public class RejectPackageMessage : IMessage
     {
-        public ValidatePackageMessage(string packageId, string packageVersion)
+        public RejectPackageMessage(string packageId, string packageVersion)
         {
             PackageId = packageId;
             PackageVersion = packageVersion;

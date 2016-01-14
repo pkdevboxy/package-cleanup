@@ -19,22 +19,17 @@ namespace chocolatey.package.cleanup.infrastructure.app.messaging
 
     public class FinalResultMessage : IMessage
     {
-        public FinalResultMessage(
-            string packageId,
-            string packageVersion,
-            string resultMessage,
-            bool success
-            )
+        public FinalResultMessage(string packageId, string packageVersion, string resultMessage, bool reject)
         {
             PackageId = packageId;
             PackageVersion = packageVersion;
             ResultMessage = resultMessage;
-            Success = success;
+            Reject = reject;
         }
 
         public string PackageId { get; private set; }
         public string PackageVersion { get; private set; }
         public string ResultMessage { get; private set; }
-        public bool Success { get; private set; }
+        public bool Reject { get; private set; }
     }
 }

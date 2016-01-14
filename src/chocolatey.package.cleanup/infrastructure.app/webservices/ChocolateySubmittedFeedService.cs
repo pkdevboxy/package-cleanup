@@ -9,8 +9,8 @@
 //------------------------------------------------------------------------------
 
 // Original file name: ChocolateySubmittedFeedService.cs
-// Generation date: 12/14/2015 11:54:13 PM
-namespace chocolatey.package.cleanup.infrastructure.app.webservices
+// Generation date: 1/14/2016 7:37:18 AM
+namespace NuGetGallery
 {
     
     /// <summary>
@@ -944,6 +944,27 @@ namespace chocolatey.package.cleanup.infrastructure.app.webservices
         private global::System.Nullable<global::System.DateTime> _PackageValidationResultDate;
         partial void OnPackageValidationResultDateChanging(global::System.Nullable<global::System.DateTime> value);
         partial void OnPackageValidationResultDateChanged();
+        /// <summary>
+        /// There are no comments for Property PackageCleanupResultDate in the schema.
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
+        public global::System.Nullable<global::System.DateTime> PackageCleanupResultDate
+        {
+            get
+            {
+                return this._PackageCleanupResultDate;
+            }
+            set
+            {
+                this.OnPackageCleanupResultDateChanging(value);
+                this._PackageCleanupResultDate = value;
+                this.OnPackageCleanupResultDateChanged();
+            }
+        }
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
+        private global::System.Nullable<global::System.DateTime> _PackageCleanupResultDate;
+        partial void OnPackageCleanupResultDateChanging(global::System.Nullable<global::System.DateTime> value);
+        partial void OnPackageCleanupResultDateChanged();
         /// <summary>
         /// There are no comments for Property PackageReviewedDate in the schema.
         /// </summary>

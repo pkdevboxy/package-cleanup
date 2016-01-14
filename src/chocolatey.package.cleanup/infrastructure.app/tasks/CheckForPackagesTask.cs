@@ -19,13 +19,13 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
     using System.Collections.Generic;
     using System.Linq;
     using System.Timers;
+    using NuGetGallery;
     using configuration;
     using infrastructure.messaging;
     using infrastructure.tasks;
     using messaging;
     using registration;
     using services;
-    using webservices;
 
     public class CheckForPackagesTask : ITask
     {
@@ -64,7 +64,7 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
         {
             _timer.Stop();
 
-            this.Log().Info(() => "Checking for packages to validate.");
+            this.Log().Info(() => "Checking for packages to cleanup.");
 
             try
             {
@@ -76,24 +76,44 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
                     Timeout = 70
                 };
 
-                var cdnCacheTimeout = DateTime.UtcNow.AddMinutes(-31);
+                var twentyDaysAgo = DateTime.UtcNow.AddDays(-20);
+                
                 // this only returns 30-40 results at a time but at least we'll have something to start with
+
+                //this is not a perfect check but will capture most of the items that need cleaned up.
                 IQueryable<V2FeedPackage> packageQuery =
                     service.Packages.Where(
-                        p => p.Created < cdnCacheTimeout
-                             && (p.PackageValidationResultStatus == null || p.PackageValidationResultStatus == "Pending" || p.PackageValidationResultStatus == "Unknown")
+                        p => p.Created < twentyDaysAgo
+                            && p.PackageStatus == "Submitted"
+                            && p.PackageSubmittedStatus == "Waiting"
+                            && (p.PackageCleanupResultDate == null)
+                            && ((p.PackageReviewedDate != null && p.PackageReviewedDate < twentyDaysAgo) 
+                                ||
+                                (p.PackageReviewedDate == null && p.PackageTestResultStatusDate < twentyDaysAgo)
+                                )
                         );
+
+                //todo: implement the other checks
+                //var fifteenDaysAgo = DateTime.UtcNow.AddDays(-15);
+                //IQueryable<V2FeedPackage> packageQueryForReject =
+                //     service.Packages.Where(
+                //         p => p.PackageCleanupResultDate < fifteenDaysAgo
+                //             && p.PackageStatus == "Submitted"
+                //             && p.PackageSubmittedStatus == "Waiting"
+                //         );
+
+                //int totalCount = packageQuery.Count();
 
                 // specifically reduce the call to 30 results so we get back results faster from Chocolatey.org
                 IList<V2FeedPackage> packagesToValidate = packageQuery.Take(30).ToList();
-                if (packagesToValidate.Count == 0) this.Log().Info("No packages to validate.");
-                else this.Log().Info("Pulled in {0} packages for validation.".format_with(packagesToValidate.Count));
+                if (packagesToValidate.Count == 0) this.Log().Info("No packages to cleanup.");
+                else this.Log().Info("Pulled in {0} packages for cleanup.".format_with(packagesToValidate.Count));
 
                 foreach (var package in packagesToValidate.or_empty_list_if_null())
                 {
                     this.Log().Info(() => "========== {0} v{1} ==========".format_with(package.Id, package.Version));
                     this.Log().Info("{0} v{1} found for review.".format_with(package.Title, package.Version));
-                    EventManager.publish(new ValidatePackageMessage(package.Id, package.Version));
+                    EventManager.publish(new ReminderPackageMessage(package.Id, package.Version));
                 }
             }
             catch (Exception ex)

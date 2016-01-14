@@ -15,29 +15,17 @@
 
 namespace chocolatey.package.cleanup.infrastructure.app.messaging
 {
-    using System;
-    using System.Collections.Generic;
     using infrastructure.messaging;
-    using rules;
 
-    public class PackageResultMessage : IMessage
+    public class ReminderPackageMessage : IMessage
     {
-        public PackageResultMessage(
-            string packageId,
-            string packageVersion,
-            IEnumerable<PackageValidationResult> validationResults,
-            DateTime? testDate
-            )
+        public ReminderPackageMessage(string packageId, string packageVersion)
         {
             PackageId = packageId;
             PackageVersion = packageVersion;
-            ValidationResults = validationResults;
-            TestDate = testDate;
         }
 
         public string PackageId { get; private set; }
         public string PackageVersion { get; private set; }
-        public IEnumerable<PackageValidationResult> ValidationResults { get; private set; }
-        public DateTime? TestDate { get; private set; }
     }
 }

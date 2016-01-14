@@ -42,7 +42,7 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
         public void initialize()
         {
             _subscription = EventManager.subscribe<FinalResultMessage>(update_website, null, null);
-            this.Log().Info(() => "{0} is now ready and waiting for {1}".format_with(GetType().Name, typeof(FinalResultMessage).Name));
+            this.Log().Info(() => "{0} is waiting for {1} messages.".format_with(GetType().Name, typeof(FinalResultMessage).Name));
         }
 
         public void shutdown()
@@ -52,13 +52,13 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
 
         public event EventHandler<WebRequestEventArgs> SendingRequest = delegate { };
 
-        private const string SERVICE_ENDPOINT = "/api/v2/validate";
+        private const string SERVICE_ENDPOINT = "/api/v2/cleanup";
 
         private void update_website(FinalResultMessage message)
         {
             if (string.IsNullOrWhiteSpace(_configurationSettings.PackagesApiKey)) return;
 
-            this.Log().Info(() => "Updating website for {0} v{1} with results (package {2} requirements).".format_with(message.PackageId, message.PackageVersion, message.Success ? "passed" : "failed"));
+            this.Log().Info(() => "Updating website for {0} v{1} with cleanup ({2}).".format_with(message.PackageId, message.PackageVersion, message.Reject ? "rejecting stale package" : "sending reminder"));
             try
             {
                 var url = string.Join("/", SERVICE_ENDPOINT, message.PackageId, message.PackageVersion);
@@ -66,8 +66,8 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
 
                 var postData = new StringBuilder();
                 postData.Append("apikey=" + HttpUtility.UrlEncode(_configurationSettings.PackagesApiKey));
-                postData.Append("&success=" + HttpUtility.UrlEncode(message.Success.to_string().to_lower()));
-                postData.Append("&validationComments=" + HttpUtility.UrlEncode(message.ResultMessage));
+                postData.Append("&reject=" + HttpUtility.UrlEncode(message.Reject.to_string().to_lower()));
+                postData.Append("&cleanupComments=" + HttpUtility.UrlEncode(message.ResultMessage));
                 var form = postData.ToString();
                 var data = Encoding.ASCII.GetBytes(form);
 

@@ -43,9 +43,7 @@ namespace chocolatey.package.cleanup.host.infrastructure.registration
                     {
                         new StartupTask(),
                         new CheckForPackagesTask(container.GetInstance<IConfigurationSettings>()),
-                        new DownloadSubmittedPackageTask(container.GetInstance<IConfigurationSettings>(), container.GetInstance<INuGetService>(), container.GetInstance<IFileSystem>()),
                         new PrepareResultsTask(),
-                        new CleanupDownloadedPackageTask(container.GetInstance<IFileSystem>()),
                         new UpdateWebsiteInformationTask(container.GetInstance<IConfigurationSettings>(), container.GetInstance<INuGetService>())
                     };
 
