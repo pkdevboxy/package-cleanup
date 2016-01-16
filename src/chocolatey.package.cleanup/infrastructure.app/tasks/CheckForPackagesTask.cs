@@ -64,7 +64,7 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
         {
             _timer.Stop();
 
-            this.Log().Info(() => "Checking for packages to cleanup.");
+            this.Log().Info(() => "Checking for packages to cleanup (remind/reject).");
 
             try
             {
@@ -93,27 +93,39 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
                                 )
                         );
 
-                //todo: implement the other checks
-                //var fifteenDaysAgo = DateTime.UtcNow.AddDays(-15);
-                //IQueryable<V2FeedPackage> packageQueryForReject =
-                //     service.Packages.Where(
-                //         p => p.PackageCleanupResultDate < fifteenDaysAgo
-                //             && p.PackageStatus == "Submitted"
-                //             && p.PackageSubmittedStatus == "Waiting"
-                //         );
-
                 //int totalCount = packageQuery.Count();
 
                 // specifically reduce the call to 30 results so we get back results faster from Chocolatey.org
-                IList<V2FeedPackage> packagesToValidate = packageQuery.Take(30).ToList();
-                if (packagesToValidate.Count == 0) this.Log().Info("No packages to cleanup.");
-                else this.Log().Info("Pulled in {0} packages for cleanup.".format_with(packagesToValidate.Count));
+                IList<V2FeedPackage> packages = packageQuery.Take(30).ToList();
+                if (packages.Count == 0) this.Log().Info("No packages to remind.");
+                else this.Log().Info("Pulled in {0} packages for reminders.".format_with(packages.Count));
 
-                foreach (var package in packagesToValidate.or_empty_list_if_null())
+                foreach (var package in packages.or_empty_list_if_null())
                 {
                     this.Log().Info(() => "========== {0} v{1} ==========".format_with(package.Id, package.Version));
                     this.Log().Info("{0} v{1} found for review.".format_with(package.Title, package.Version));
                     EventManager.publish(new ReminderPackageMessage(package.Id, package.Version));
+                }
+
+                //todo: there may be a bug in this selection
+                var fifteenDaysAgo = DateTime.UtcNow.AddDays(-15);
+                IQueryable<V2FeedPackage> packageQueryForReject =
+                     service.Packages.Where(
+                         p => p.PackageCleanupResultDate < fifteenDaysAgo
+                             && p.PackageStatus == "Submitted"
+                             && p.PackageSubmittedStatus == "Waiting"
+                         );
+                
+                // specifically reduce the call to 30 results so we get back results faster from Chocolatey.org
+                IList<V2FeedPackage> packagesForReject = packageQuery.Take(30).ToList();
+                if (packages.Count == 0) this.Log().Info("No packages to reject.");
+                else this.Log().Info("Pulled in {0} packages for rejection.".format_with(packages.Count));
+
+                foreach (var package in packagesForReject.or_empty_list_if_null())
+                {
+                    this.Log().Info(() => "========== {0} v{1} ==========".format_with(package.Id, package.Version));
+                    this.Log().Info("{0} v{1} found for review.".format_with(package.Title, package.Version));
+                    EventManager.publish(new RejectPackageMessage(package.Id, package.Version));
                 }
             }
             catch (Exception ex)

@@ -44,8 +44,7 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
         {
             var resultsMessage = new StringBuilder();
 
-
-            resultsMessage.AppendLine("We've found {0} v{1} in a submitted status and waiting for your next actions. It has had no updates within 20 days after a reviewer has asked for corrections. Please note that if there is no response or fix of the package within 15 days of this message, this package version will automatically be closed (rejected) due to being stale.".format_with(message.PackageId,message.PackageVersion));
+            resultsMessage.AppendLine("We've found {0} v{1} in a submitted status and waiting for your next actions. It has had no updates for 20 or more days since a reviewer has asked for corrections. Please note that if there is no response or fix of the package within 15 days of this message, this package version will automatically be closed (rejected) due to being stale.".format_with(message.PackageId,message.PackageVersion));
             resultsMessage.AppendFormat("{0}Take action:{0}".format_with(Environment.NewLine));
             resultsMessage.AppendLine(" * Log in to the site and respond to the review comments.");
             resultsMessage.AppendLine(" * Resubmit fixes for this version.");
@@ -59,7 +58,9 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
         private void process_rejection(RejectPackageMessage message)
         {
             var resultsMessage = new StringBuilder();
-            
+
+            resultsMessage.AppendLine("Unfortunately there has not been progress to move {0} v{1} towards an approved status within 15 days after the last review message, so we need to close (reject) the package version at this time. If you want to pick this version up and move it towards approval in the future, use the contact site admins link on the package page and we can move it back into a submitted status so you can submit updates.".format_with(message.PackageId, message.PackageVersion));
+ 
             EventManager.publish(new FinalResultMessage(message.PackageId, message.PackageVersion, resultsMessage.to_string(), reject: true));
         }
     }
