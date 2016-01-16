@@ -107,7 +107,6 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
                     EventManager.publish(new ReminderPackageMessage(package.Id, package.Version));
                 }
 
-                //todo: there may be a bug in this selection
                 var fifteenDaysAgo = DateTime.UtcNow.AddDays(-15);
                 IQueryable<V2FeedPackage> packageQueryForReject =
                      service.Packages.Where(
@@ -117,8 +116,8 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
                          );
                 
                 // specifically reduce the call to 30 results so we get back results faster from Chocolatey.org
-                IList<V2FeedPackage> packagesForReject = packageQuery.Take(30).ToList();
-                if (packages.Count == 0) this.Log().Info("No packages to reject.");
+                IList<V2FeedPackage> packagesForReject = packageQueryForReject.Take(30).ToList();
+                if (packagesForReject.Count == 0) this.Log().Info("No packages to reject.");
                 else this.Log().Info("Pulled in {0} packages for rejection.".format_with(packages.Count));
 
                 foreach (var package in packagesForReject.or_empty_list_if_null())
