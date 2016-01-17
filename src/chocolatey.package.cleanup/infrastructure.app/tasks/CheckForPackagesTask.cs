@@ -132,7 +132,7 @@ namespace chocolatey.package.cleanup.infrastructure.app.tasks
                 Bootstrap.handle_exception(ex);
             }
 
-            this.Log().Info(() => "Finished checking for packages to validate. Sleeping for {0} minute(s).".format_with(TIMER_INTERVAL / 60000));
+            this.Log().Info(() => "Finished checking for packages to cleanup. Sleeping for {0} minute(s).".format_with(TIMER_INTERVAL / 60000));
 
             _timer.Start();
         }
